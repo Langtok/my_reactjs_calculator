@@ -38,3 +38,12 @@
   .button.delete:hover {
     background-color: #b0b0b0;
   }
+  
+  .button.underscore {
+    background-color: #a9a9a9; /* Medium gray for underscore */
+    color: #000;
+  }
+  
+  .button.underscore:hover {
+    background-color: #909090;
+  }

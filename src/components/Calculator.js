@@ -11,11 +11,8 @@ const Calculator = () => {
 
   // Function to format numbers with underscores as thousand separators
   const formatNumber = (num) => {
-    // Convert number to string
     const numStr = num.toString();
-    // If the number is less than 1000, return it as is
     if (Math.abs(num) < 1000) return numStr;
-    // Add underscores as thousand separators
     return numStr.replace(/\B(?=(\d{3})+(?!\d))/g, '_');
   };
 
@@ -33,14 +30,14 @@ const Calculator = () => {
     if (prevValue === null) {
       const numericValue = parseFloat(display.replace(/_/g, ''));
       setPrevValue(numericValue);
-      setExpression(expression + ' ' + op + ' ');
+      setExpression(expression + ' ' + op + ' '); // Keep the full expression
       setDisplay('0');
       setOperation(op);
     } else if (operation) {
       const numericValue = parseFloat(display.replace(/_/g, ''));
       const result = calculate(prevValue, numericValue, operation);
-      setDisplay(result.toString());
-      setExpression(result + ' ' + op + ' ');
+      setDisplay('0');
+      setExpression(`${expression}${display} ${op} `); // Append the current display and new operator
       setPrevValue(result);
       setOperation(op);
     }
@@ -60,10 +57,9 @@ const Calculator = () => {
     if (prevValue !== null && operation) {
       const currentValue = parseFloat(display.replace(/_/g, ''));
       const result = calculate(prevValue, currentValue, operation);
-      // Format the result with underscores if needed
       const formattedResult = typeof result === 'number' ? formatNumber(result) : result;
-      // Use the original expression (which includes underscores) and append the formatted result
-      setExpression(`${expression} = ${formattedResult}`);
+      // Append the current display and the result to the expression
+      setExpression(`${expression}${display} = ${formattedResult}`);
       setDisplay(result.toString());
       setPrevValue(null);
       setOperation('=');
@@ -146,6 +142,7 @@ const Calculator = () => {
         <Button label="=" onClick={handleEquals} />
         <Button label="/" onClick={() => handleOperation('/')} type="operator" />
         <Button label="Del" onClick={handleDelete} type="delete" />
+        <Button label="_" onClick={() => handleNumber('_')} type="underscore" />
       </div>
     </div>
   );
