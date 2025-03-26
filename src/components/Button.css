@@ -29,3 +29,12 @@
   .button.clear:hover {
     background-color: #e65c5c;
   }
+  
+  .button.delete {
+    background-color: #d3d3d3; /* Light gray for delete */
+    color: #000;
+  }
+  
+  .button.delete:hover {
+    background-color: #b0b0b0;
+  }

@@ -1,15 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './Calculator.css';
 import Display from './Display';
 import Button from './Button';
 
 const Calculator = () => {
-  const [display, setDisplay] = useState('0'); // Current input or result
-  const [expression, setExpression] = useState(''); // Full expression (e.g., "1 + 5")
+  const [display, setDisplay] = useState('0');
+  const [expression, setExpression] = useState('');
   const [prevValue, setPrevValue] = useState(null);
   const [operation, setOperation] = useState(null);
 
-  const handleNumber = (num) => {
+  // Function to format numbers with underscores as thousand separators
+  const formatNumber = (num) => {
+    // Convert number to string
+    const numStr = num.toString();
+    // If the number is less than 1000, return it as is
+    if (Math.abs(num) < 1000) return numStr;
+    // Add underscores as thousand separators
+    return numStr.replace(/\B(?=(\d{3})+(?!\d))/g, '_');
+  };
+
+  const handleNumber = useCallback((num) => {
     if (display === '0' || operation === '=') {
       setDisplay(num);
       setExpression(num);
@@ -17,22 +27,24 @@ const Calculator = () => {
       setDisplay(display + num);
       setExpression(expression + num);
     }
-  };
+  }, [display, expression, operation]);
 
-  const handleOperation = (op) => {
+  const handleOperation = useCallback((op) => {
     if (prevValue === null) {
-      setPrevValue(parseFloat(display));
+      const numericValue = parseFloat(display.replace(/_/g, ''));
+      setPrevValue(numericValue);
       setExpression(expression + ' ' + op + ' ');
       setDisplay('0');
       setOperation(op);
     } else if (operation) {
-      const result = calculate(prevValue, parseFloat(display), operation);
+      const numericValue = parseFloat(display.replace(/_/g, ''));
+      const result = calculate(prevValue, numericValue, operation);
       setDisplay(result.toString());
       setExpression(result + ' ' + op + ' ');
       setPrevValue(result);
       setOperation(op);
     }
-  };
+  }, [display, expression, prevValue, operation]);
 
   const calculate = (a, b, op) => {
     switch (op) {
@@ -44,24 +56,74 @@ const Calculator = () => {
     }
   };
 
-  const handleEquals = () => {
+  const handleEquals = useCallback(() => {
     if (prevValue !== null && operation) {
-      const currentValue = parseFloat(display);
+      const currentValue = parseFloat(display.replace(/_/g, ''));
       const result = calculate(prevValue, currentValue, operation);
-      // Show the full expression including the arguments and the result
-      setExpression(`${prevValue} ${operation} ${currentValue} = ${result}`);
+      // Format the result with underscores if needed
+      const formattedResult = typeof result === 'number' ? formatNumber(result) : result;
+      // Use the original expression (which includes underscores) and append the formatted result
+      setExpression(`${expression} = ${formattedResult}`);
       setDisplay(result.toString());
       setPrevValue(null);
       setOperation('=');
     }
-  };
+  }, [display, expression, prevValue, operation]);
 
-  const handleClear = () => {
+  const handleClear = useCallback(() => {
     setDisplay('0');
     setExpression('');
     setPrevValue(null);
     setOperation(null);
-  };
+  }, []);
+
+  const handleDelete = useCallback(() => {
+    if (operation === '=') {
+      // If we just finished a calculation, clear everything to start fresh
+      setDisplay('0');
+      setExpression('');
+      setPrevValue(null);
+      setOperation(null);
+    } else if (display.length > 1) {
+      // Remove the last character from display
+      const newDisplay = display.slice(0, -1);
+      setDisplay(newDisplay);
+      // Update the expression by removing the last character
+      setExpression(expression.slice(0, -1));
+    } else {
+      // If only one character is left, reset to '0'
+      setDisplay('0');
+      setExpression(expression.slice(0, -1));
+    }
+  }, [display, expression, operation]);
+
+  useEffect(() => {
+    const handleKeyPress = (event) => {
+      const { key } = event;
+      if (/[0-9_]/.test(key)) {
+        handleNumber(key);
+      } else if (key === '+') {
+        handleOperation('+');
+      } else if (key === '-') {
+        handleOperation('-');
+      } else if (key === '*') {
+        handleOperation('*');
+      } else if (key === '/') {
+        handleOperation('/');
+      } else if (key === '=' || key === 'Enter') {
+        handleEquals();
+      } else if (key === 'c' || key === 'C' || key === 'Escape') {
+        handleClear();
+      } else if (key === 'Backspace') {
+        handleDelete();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyPress);
+    return () => {
+      document.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [handleNumber, handleOperation, handleEquals, handleClear, handleDelete]);
 
   return (
     <div className="calculator">
@@ -83,6 +145,7 @@ const Calculator = () => {
         <Button label="0" onClick={() => handleNumber('0')} />
         <Button label="=" onClick={handleEquals} />
         <Button label="/" onClick={() => handleOperation('/')} type="operator" />
+        <Button label="Del" onClick={handleDelete} type="delete" />
       </div>
     </div>
   );
