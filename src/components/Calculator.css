@@ -1,9 +1,10 @@
 .calculator {
     width: 300px;
     padding: 20px;
-    background-color: #fff;
+    background-color: #b0c4de; /* Blue-gray background */
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: 2px solid #00ced1; /* Teal border */
   }
   
   .buttons {
