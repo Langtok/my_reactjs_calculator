@@ -1,0 +1,81 @@
+.container {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(140deg, #6a11cb, #2575fc);
+}
+
+.calculator {
+  padding: 20px;
+  border-radius: 15px;
+  background-color: whitesmoke;
+}
+
+form input {
+  border: none;
+  outline: 0;
+  width: 60px;
+  height: 60px;
+  font-size: 16px;
+  background-color: purple;
+  margin: 2px;
+  border-radius: 10px;
+  color: white;
+  font-weight: bolder;  
+  cursor: pointer;
+}
+
+
+form input[type="button"]:hover {
+  background-color: mediumpurple;
+}
+
+
+form input[value="DE"] {
+  background-color: red;
+}
+
+form input[value="DE"]:hover {
+  background-color: darkred;
+}
+
+
+form input[value="+"],
+form input[value="-"],
+form input[value="*"],
+form input[value="/"] {
+  background-color: darkorange;
+}
+
+form input[value="+"]:hover,
+form input[value="-"]:hover,
+form input[value="*"]:hover,
+form input[value="/"]:hover {
+  background-color: orange;
+}
+
+form .display {
+  display: flex;
+  justify-content: flex-end;
+  margin: 5px 0px 15px 0px;
+}
+
+form .display input {
+  text-align: right;
+  flex: 1;
+  font-size: 40px;
+  padding: 5px 10px;
+  background-color: black;
+  color: white;
+}
+
+form input.equal {
+  width: 123px;
+  background-color: green;
+}
+
+form input.equal:hover {
+  background-color: darkgreen;
+}
